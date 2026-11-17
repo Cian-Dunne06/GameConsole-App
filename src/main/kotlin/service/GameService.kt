@@ -15,5 +15,5 @@ class GameService {
         return game
     }
 
-    fun getGames(): List<Game> = games.toList()
+    fun getGames(): List<Game> = games
 }
