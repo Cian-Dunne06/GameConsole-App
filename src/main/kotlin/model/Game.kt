@@ -11,8 +11,8 @@ data class Game(
 ) {
     init {
         require(gameId >= 0) { "gameId must not be negative" }
-        require(title.isNotEmpty()) { "title must not be blank" }
+        require(title.isNotBlank()) { "title must not be blank" }
         require(rating in 0..100) { "rating must be between 0 and 100" }
-        require(genre.isNotEmpty()) { "genre must not be blank" }
+        require(genre.isNotBlank()) { "genre must not be blank" }
     }
 }
