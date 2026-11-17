@@ -16,4 +16,6 @@ class GameService {
     }
 
     fun getGames(): List<Game> = games
+
+    fun findGameById(id: Int): Game? = games.find { it.gameId == id }
 }
