@@ -18,4 +18,11 @@ class GameService {
     fun getGames(): List<Game> = games
 
     fun findGameById(id: Int): Game? = games.find { it.gameId == id }
+
+    fun updateGame(id: Int, title: String, rating: Int, releaseDate: LocalDate, genre: String): Boolean {
+        val index = games.indexOfFirst { it.gameId == id }
+        if (index == -1) return false
+        games[index] = Game(id, title, rating, releaseDate, genre)
+        return true
+    }
 }
