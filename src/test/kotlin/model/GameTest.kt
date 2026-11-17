@@ -67,4 +67,14 @@ class GameTest {
     fun `copy with an invalid rating is rejected`() {
         assertFailsWith<IllegalArgumentException> { validGame().copy(rating = 500) }
     }
+
+    @Test
+    fun `toString shows id, title, rating, genre and release date on separate lines`() {
+        val expected = listOf(
+            "(1) Zelda",
+            "Rating: 97/100 | Genre: Adventure",
+            "Release Date: 2017-03-03"
+        )
+        assertEquals(expected, validGame().toString().lines())
+    }
 }
