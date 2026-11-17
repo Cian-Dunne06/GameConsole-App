@@ -15,4 +15,12 @@ data class Game(
         require(rating in 0..100) { "rating must be between 0 and 100" }
         require(genre.isNotBlank()) { "genre must not be blank" }
     }
+
+    override fun toString(): String =
+        """
+        |($gameId) $title 
+        |Rating: $rating/100 | Genre: $genre | 
+        |Release Date: $releaseDate
+        """.trimMargin()
+
 }
