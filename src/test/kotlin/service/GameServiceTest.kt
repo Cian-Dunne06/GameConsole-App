@@ -1,11 +1,13 @@
 package service
 
+import model.Game
 import org.junit.jupiter.api.Nested
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 
 class GameServiceTest {
@@ -78,6 +80,48 @@ class GameServiceTest {
         @Test
         fun `findGameById returns null on an empty service`() {
             assertNull(service.findGameById(0))
+        }
+    }
+
+    @Nested
+    inner class UpdateGame {
+
+        private val newDate = LocalDate.of(2023, 5, 12)
+
+        @Test
+        fun `updateGame replaces the values and returns true`() {
+            val original = addGame()
+            val result = service.updateGame(original.gameId, "Mario", 80, newDate, "Platformer")
+            assertTrue(result)
+            assertEquals(
+                Game(original.gameId, "Mario", 80, newDate, "Platformer"),
+                service.findGameById(original.gameId)
+            )
+        }
+
+        @Test
+        fun `updateGame changes only the game with that id`() {
+            val zelda = addGame()
+            val mario = addGame(title = "Mario")
+            service.updateGame(zelda.gameId, "Halo", 80, newDate, "Shooter")
+            assertEquals(mario, service.findGameById(mario.gameId))
+            assertEquals(2, service.getGames().size)
+        }
+
+        @Test
+        fun `updateGame returns false and changes nothing when the id does not exist`() {
+            val zelda = addGame()
+            assertFalse(service.updateGame(99, "Mario", 80, newDate, "Platformer"))
+            assertEquals(listOf(zelda), service.getGames())
+        }
+
+        @Test
+        fun `updateGame with invalid data is rejected and the stored game is unchanged`() {
+            val zelda = addGame()
+            assertFailsWith<IllegalArgumentException> {
+                service.updateGame(zelda.gameId, "", 80, newDate, "Platformer")
+            }
+            assertEquals(zelda, service.findGameById(zelda.gameId))
         }
     }
 }
