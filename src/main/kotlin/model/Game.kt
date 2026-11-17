@@ -18,8 +18,8 @@ data class Game(
 
     override fun toString(): String =
         """
-        |($gameId) $title 
-        |Rating: $rating/100 | Genre: $genre | 
+        |($gameId) $title
+        |Rating: $rating/100 | Genre: $genre
         |Release Date: $releaseDate
         """.trimMargin()
 
