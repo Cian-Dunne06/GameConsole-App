@@ -1,0 +1,167 @@
+package service
+
+import model.Game
+import org.junit.jupiter.api.Nested
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+
+class GameServiceTest {
+
+    private val service = GameService()
+
+    private fun addGame(
+        title: String = "Zelda",
+        rating: Int = 97,
+        releaseYear: Int = 2017,
+        genre: String = "Adventure"
+    ) = service.addGame(title, rating, releaseYear, genre)
+
+    @Nested
+    inner class GetGames {
+
+        @Test
+        fun `a new service has no games`() {
+            assertTrue(service.getGames().isEmpty())
+        }
+    }
+
+    @Nested
+    inner class AddGame {
+
+        @Test
+        fun `addGame stores the game and returns it`() {
+            val game = addGame()
+            assertEquals("Zelda", game.title)
+            assertEquals(97, game.rating)
+            assertEquals(listOf(game), service.getGames())
+        }
+
+        @Test
+        fun `ids are assigned in sequence starting at 0`() {
+            assertEquals(0, addGame().gameId)
+            assertEquals(1, addGame(title = "Mario").gameId)
+            assertEquals(2, addGame(title = "Halo").gameId)
+        }
+
+        @Test
+        fun `adding an invalid game is rejected and nothing is stored`() {
+            assertFailsWith<IllegalArgumentException> { addGame(title = "") }
+            assertTrue(service.getGames().isEmpty())
+        }
+
+        @Test
+        fun `a rejected add does not use up an id`() {
+            assertFailsWith<IllegalArgumentException> { addGame(rating = 101) }
+            assertEquals(0, addGame().gameId)
+        }
+    }
+
+    @Nested
+    inner class FindGameById {
+        @Test
+        fun `findGameById returns the game with that id`() {
+            val zelda = addGame()
+            val mario = addGame(title = "Mario")
+            assertEquals(zelda, service.findGameById(zelda.gameId))
+            assertEquals(mario, service.findGameById(mario.gameId))
+        }
+
+        @Test
+        fun `findGameById returns null when no game has that id`() {
+            addGame()
+            assertNull(service.findGameById(99))
+        }
+
+        @Test
+        fun `findGameById returns null on an empty service`() {
+            assertNull(service.findGameById(0))
+        }
+    }
+
+    @Nested
+    inner class UpdateGame {
+
+        private val newYear = 2023
+
+        @Test
+        fun `updateGame replaces the values and returns true`() {
+            val original = addGame()
+            val result = service.updateGame(original.gameId, "Mario", 80, newYear, "Platformer")
+            assertTrue(result)
+            assertEquals(
+                Game(original.gameId, "Mario", 80, newYear, "Platformer"),
+                service.findGameById(original.gameId)
+            )
+        }
+
+        @Test
+        fun `updateGame changes only the game with that id`() {
+            val zelda = addGame()
+            val mario = addGame(title = "Mario")
+            service.updateGame(zelda.gameId, "Halo", 80, newYear, "Shooter")
+            assertEquals(mario, service.findGameById(mario.gameId))
+            assertEquals(2, service.getGames().size)
+        }
+
+        @Test
+        fun `updateGame returns false and changes nothing when the id does not exist`() {
+            val zelda = addGame()
+            assertFalse(service.updateGame(99, "Mario", 80, newYear, "Platformer"))
+            assertEquals(listOf(zelda), service.getGames())
+        }
+
+        @Test
+        fun `updateGame with invalid data is rejected and the stored game is unchanged`() {
+            val zelda = addGame()
+            assertFailsWith<IllegalArgumentException> {
+                service.updateGame(zelda.gameId, "", 80, newYear, "Platformer")
+            }
+            assertEquals(zelda, service.findGameById(zelda.gameId))
+        }
+    }
+
+    @Nested
+    inner class DeleteGame {
+
+        @Test
+        fun `deleteGame removes the game and returns true`() {
+            val zelda = addGame()
+            assertTrue(service.deleteGame(zelda.gameId))
+            assertNull(service.findGameById(zelda.gameId))
+            assertTrue(service.getGames().isEmpty())
+        }
+
+        @Test
+        fun `deleteGame removes only the game with that id`() {
+            val zelda = addGame()
+            val mario = addGame(title = "Mario")
+            service.deleteGame(zelda.gameId)
+            assertEquals(listOf(mario), service.getGames())
+        }
+
+        @Test
+        fun `deleteGame returns false and changes nothing when the id does not exist`() {
+            val zelda = addGame()
+            assertFalse(service.deleteGame(99))
+            assertEquals(listOf(zelda), service.getGames())
+        }
+
+        @Test
+        fun `deleteGame returns false on an empty service`() {
+            assertFalse(service.deleteGame(0))
+        }
+
+        @Test
+        fun `ids are not reused after a delete`() {
+            val zelda = addGame()
+            addGame(title = "Mario")
+            service.deleteGame(zelda.gameId)
+            assertEquals(2, addGame(title = "Halo").gameId)
+            assertEquals(3, addGame(title = "Doom").gameId)
+        }
+    }
+}
