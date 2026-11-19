@@ -4,6 +4,7 @@ package model
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 import java.time.Year
 
 class GameTest {
@@ -11,10 +12,11 @@ class GameTest {
     private fun validGame(
         gameId: Int = 1,
         title: String = "Zelda",
+        version: Int? = null,
         rating: Int = 97,
         releaseYear: Int = 2017,
         genre: String = "Adventure"
-    ) = Game(gameId, title, rating, releaseYear, genre)
+    ) = Game(gameId, title, version, rating, releaseYear, genre)
 
     @Test
     fun `game is created with the supplied values`() {
@@ -93,5 +95,37 @@ class GameTest {
     @Test
     fun `release year above the upper limit is rejected`() {
         assertFailsWith<IllegalArgumentException> { validGame(releaseYear = Year.now().value + 2) }
+    }
+
+    @Test
+    fun `a game without a version is accepted`() {
+        assertNull(validGame(version = null).version)
+    }
+
+    @Test
+    fun `a version of 1 or more is accepted`() {
+        assertEquals(1, validGame(version = 1).version)
+        assertEquals(2, validGame(version = 2).version)
+    }
+
+    @Test
+    fun `a version below 1 is rejected`() {
+        assertFailsWith<IllegalArgumentException> { validGame(version = 0) }
+        assertFailsWith<IllegalArgumentException> { validGame(version = -1) }
+    }
+
+    @Test
+    fun `displayTitle is just the title when there is no version`() {
+        assertEquals("Zelda", validGame().displayTitle)
+    }
+
+    @Test
+    fun `displayTitle adds the version after the title`() {
+        assertEquals("Super Mario Galaxy 2", validGame(title = "Super Mario Galaxy", version = 2).displayTitle)
+    }
+
+    @Test
+    fun `toString shows the display title`() {
+        assertEquals("(1) Super Mario Galaxy 2", validGame(title = "Super Mario Galaxy", version = 2).toString().lines().first())
     }
 }
