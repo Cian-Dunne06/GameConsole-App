@@ -22,5 +22,4 @@ data class Game(
         |Rating: $rating/100 | Genre: $genre
         |Release Date: $releaseDate
         """.trimMargin()
-
 }

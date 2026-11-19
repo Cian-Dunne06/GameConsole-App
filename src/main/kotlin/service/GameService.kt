@@ -25,4 +25,6 @@ class GameService {
         games[index] = Game(id, title, rating, releaseDate, genre)
         return true
     }
+
+    fun deleteGame(id: Int): Boolean = games.removeIf { it.gameId == id }
 }
