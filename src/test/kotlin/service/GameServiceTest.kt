@@ -15,10 +15,11 @@ class GameServiceTest {
 
     private fun addGame(
         title: String = "Zelda",
+        version: Int? = null,
         rating: Int = 97,
         releaseYear: Int = 2017,
         genre: String = "Adventure"
-    ) = service.addGame(title, rating, releaseYear, genre)
+    ) = service.addGame(title, version, rating, releaseYear, genre)
 
     @Nested
     inner class GetGames {
@@ -58,6 +59,13 @@ class GameServiceTest {
             assertFailsWith<IllegalArgumentException> { addGame(rating = 101) }
             assertEquals(0, addGame().gameId)
         }
+
+        @Test
+        fun `addGame stores the version`() {
+            val game = addGame(title = "Super Mario Galaxy", version = 2)
+            assertEquals(2, game.version)
+            assertEquals(game, service.findGameById(game.gameId))
+        }
     }
 
     @Nested
@@ -90,10 +98,10 @@ class GameServiceTest {
         @Test
         fun `updateGame replaces the values and returns true`() {
             val original = addGame()
-            val result = service.updateGame(original.gameId, "Mario", 80, newYear, "Platformer")
+            val result = service.updateGame(original.gameId, "Mario", null,80, newYear, "Platformer")
             assertTrue(result)
             assertEquals(
-                Game(original.gameId, "Mario", 80, newYear, "Platformer"),
+                Game(original.gameId, "Mario", null, 80, newYear, "Platformer"),
                 service.findGameById(original.gameId)
             )
         }
@@ -102,7 +110,7 @@ class GameServiceTest {
         fun `updateGame changes only the game with that id`() {
             val zelda = addGame()
             val mario = addGame(title = "Mario")
-            service.updateGame(zelda.gameId, "Halo", 80, newYear, "Shooter")
+            service.updateGame(zelda.gameId, "Halo", null, 80, newYear, "Shooter")
             assertEquals(mario, service.findGameById(mario.gameId))
             assertEquals(2, service.getGames().size)
         }
@@ -110,7 +118,7 @@ class GameServiceTest {
         @Test
         fun `updateGame returns false and changes nothing when the id does not exist`() {
             val zelda = addGame()
-            assertFalse(service.updateGame(99, "Mario", 80, newYear, "Platformer"))
+            assertFalse(service.updateGame(99, "Mario", null, 80, newYear, "Platformer"))
             assertEquals(listOf(zelda), service.getGames())
         }
 
@@ -118,7 +126,7 @@ class GameServiceTest {
         fun `updateGame with invalid data is rejected and the stored game is unchanged`() {
             val zelda = addGame()
             assertFailsWith<IllegalArgumentException> {
-                service.updateGame(zelda.gameId, "", 80, newYear, "Platformer")
+                service.updateGame(zelda.gameId, "", null, 80, newYear, "Platformer")
             }
             assertEquals(zelda, service.findGameById(zelda.gameId))
         }
