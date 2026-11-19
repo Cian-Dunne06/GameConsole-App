@@ -124,4 +124,45 @@ class GameServiceTest {
             assertEquals(zelda, service.findGameById(zelda.gameId))
         }
     }
+
+    @Nested
+    inner class DeleteGame {
+
+        @Test
+        fun `deleteGame removes the game and returns true`() {
+            val zelda = addGame()
+            assertTrue(service.deleteGame(zelda.gameId))
+            assertNull(service.findGameById(zelda.gameId))
+            assertTrue(service.getGames().isEmpty())
+        }
+
+        @Test
+        fun `deleteGame removes only the game with that id`() {
+            val zelda = addGame()
+            val mario = addGame(title = "Mario")
+            service.deleteGame(zelda.gameId)
+            assertEquals(listOf(mario), service.getGames())
+        }
+
+        @Test
+        fun `deleteGame returns false and changes nothing when the id does not exist`() {
+            val zelda = addGame()
+            assertFalse(service.deleteGame(99))
+            assertEquals(listOf(zelda), service.getGames())
+        }
+
+        @Test
+        fun `deleteGame returns false on an empty service`() {
+            assertFalse(service.deleteGame(0))
+        }
+
+        @Test
+        fun `ids are not reused after a delete`() {
+            val zelda = addGame()
+            addGame(title = "Mario")
+            service.deleteGame(zelda.gameId)
+            assertEquals(2, addGame(title = "Halo").gameId)
+            assertEquals(3, addGame(title = "Doom").gameId)
+        }
+    }
 }
