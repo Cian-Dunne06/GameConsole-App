@@ -2,7 +2,6 @@ package service
 
 import model.Game
 import org.junit.jupiter.api.Nested
-import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -17,12 +16,12 @@ class GameServiceTest {
     private fun addGame(
         title: String = "Zelda",
         rating: Int = 97,
-        releaseDate: LocalDate = LocalDate.of(2017, 3, 3),
+        releaseYear: Int = 2017,
         genre: String = "Adventure"
-    ) = service.addGame(title, rating, releaseDate, genre)
+    ) = service.addGame(title, rating, releaseYear, genre)
 
     @Nested
-    inner class GetGame {
+    inner class GetGames {
 
         @Test
         fun `a new service has no games`() {
@@ -86,15 +85,15 @@ class GameServiceTest {
     @Nested
     inner class UpdateGame {
 
-        private val newDate = LocalDate.of(2023, 5, 12)
+        private val newYear = 2023
 
         @Test
         fun `updateGame replaces the values and returns true`() {
             val original = addGame()
-            val result = service.updateGame(original.gameId, "Mario", 80, newDate, "Platformer")
+            val result = service.updateGame(original.gameId, "Mario", 80, newYear, "Platformer")
             assertTrue(result)
             assertEquals(
-                Game(original.gameId, "Mario", 80, newDate, "Platformer"),
+                Game(original.gameId, "Mario", 80, newYear, "Platformer"),
                 service.findGameById(original.gameId)
             )
         }
@@ -103,7 +102,7 @@ class GameServiceTest {
         fun `updateGame changes only the game with that id`() {
             val zelda = addGame()
             val mario = addGame(title = "Mario")
-            service.updateGame(zelda.gameId, "Halo", 80, newDate, "Shooter")
+            service.updateGame(zelda.gameId, "Halo", 80, newYear, "Shooter")
             assertEquals(mario, service.findGameById(mario.gameId))
             assertEquals(2, service.getGames().size)
         }
@@ -111,7 +110,7 @@ class GameServiceTest {
         @Test
         fun `updateGame returns false and changes nothing when the id does not exist`() {
             val zelda = addGame()
-            assertFalse(service.updateGame(99, "Mario", 80, newDate, "Platformer"))
+            assertFalse(service.updateGame(99, "Mario", 80, newYear, "Platformer"))
             assertEquals(listOf(zelda), service.getGames())
         }
 
@@ -119,7 +118,7 @@ class GameServiceTest {
         fun `updateGame with invalid data is rejected and the stored game is unchanged`() {
             val zelda = addGame()
             assertFailsWith<IllegalArgumentException> {
-                service.updateGame(zelda.gameId, "", 80, newDate, "Platformer")
+                service.updateGame(zelda.gameId, "", 80, newYear, "Platformer")
             }
             assertEquals(zelda, service.findGameById(zelda.gameId))
         }

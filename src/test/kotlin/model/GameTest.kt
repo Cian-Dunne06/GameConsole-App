@@ -1,9 +1,10 @@
 package model
 
-import java.time.LocalDate
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import java.time.Year
 
 class GameTest {
 
@@ -11,9 +12,9 @@ class GameTest {
         gameId: Int = 1,
         title: String = "Zelda",
         rating: Int = 97,
-        releaseDate: LocalDate = LocalDate.of(2017, 3, 3),
+        releaseYear: Int = 2017,
         genre: String = "Adventure"
-    ) = Game(gameId, title, rating, releaseDate, genre)
+    ) = Game(gameId, title, rating, releaseYear, genre)
 
     @Test
     fun `game is created with the supplied values`() {
@@ -21,7 +22,7 @@ class GameTest {
         assertEquals(1, game.gameId)
         assertEquals("Zelda", game.title)
         assertEquals(97, game.rating)
-        assertEquals(LocalDate.of(2017, 3, 3), game.releaseDate)
+        assertEquals(2017, game.releaseYear)
         assertEquals("Adventure", game.genre)
     }
 
@@ -73,8 +74,24 @@ class GameTest {
         val expected = listOf(
             "(1) Zelda",
             "Rating: 97/100 | Genre: Adventure",
-            "Release Date: 2017-03-03"
+            "Release Year: 2017"
         )
         assertEquals(expected, validGame().toString().lines())
+    }
+
+    @Test
+    fun `release years at the lower and upper limits are accepted`() {
+        assertEquals(1958, validGame(releaseYear = 1958).releaseYear)
+        assertEquals(Year.now().value + 1, validGame(releaseYear = Year.now().value + 1).releaseYear)
+    }
+
+    @Test
+    fun `release year below the lower limit is rejected`() {
+        assertFailsWith<IllegalArgumentException> { validGame(releaseYear = 1957) }
+    }
+
+    @Test
+    fun `release year above the upper limit is rejected`() {
+        assertFailsWith<IllegalArgumentException> { validGame(releaseYear = Year.now().value + 2) }
     }
 }
