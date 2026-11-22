@@ -4,6 +4,7 @@ import service.GameService
 import utils.readNextInt
 import utils.readNextLine
 import utils.readNextOptionalInt
+import utils.readNextBoolean
 
 private data class GameDetails(
     val title: String,
@@ -23,6 +24,7 @@ class GameMenu(private val gameService: GameService) {
                 1 -> addGame()
                 2 -> listGames()
                 3 -> updateGame()
+                4 -> deleteGame()
                 0 -> println("Exiting App")
                 else -> println("Invalid option")
             }
@@ -38,6 +40,7 @@ class GameMenu(private val gameService: GameService) {
             ||  1) Add a game             |
             ||  2) List games             |
             ||  3) Update a game          |
+            ||  4) Delete a game          |
             |------------------------------
             ||  0) Exit                   |
             |------------------------------
@@ -102,6 +105,27 @@ class GameMenu(private val gameService: GameService) {
             println(if (updated) "Game updated" else "Game not found")
         } catch (e: IllegalArgumentException) {
             println("Game not updated: ${e.message}")
+        }
+    }
+
+    private fun deleteGame() {
+        if (gameService.getGames().isEmpty()) {
+            println("No games stored")
+            return
+        }
+
+        listGames()
+        val id = readNextInt("ID of the game to delete: ")
+        val game = gameService.findGameById(id)
+        if (game == null) {
+            println("No game with ID $id")
+            return
+        }
+
+        if (readNextBoolean("Delete '${game.displayTitle}'? (y/n): ")) {
+            println(if (gameService.deleteGame(id)) "Game deleted" else "Game not found")
+        } else {
+            println("Delete cancelled")
         }
     }
 }
