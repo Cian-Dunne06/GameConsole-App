@@ -25,7 +25,7 @@ class GameMenu(private val gameService: GameService) {
                 2 -> listGames()
                 3 -> updateGame()
                 4 -> deleteGame()
-                0 -> println("Exiting App")
+                0 -> println("Returning to main menu")
                 else -> println("Invalid option")
             }
         } while (option != 0)
@@ -42,7 +42,7 @@ class GameMenu(private val gameService: GameService) {
             ||  3) Update a game          |
             ||  4) Delete a game          |
             |------------------------------
-            ||  0) Exit                   |
+            ||  0) Back                   |
             |------------------------------
             """.trimMargin(),
         )

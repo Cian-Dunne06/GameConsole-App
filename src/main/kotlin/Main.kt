@@ -1,6 +1,6 @@
 import service.GameService
-import ui.GameMenu
+import ui.MainMenu
 
 fun main() {
-    GameMenu(GameService()).start()
+    MainMenu(GameService()).start()
 }
