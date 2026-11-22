@@ -64,3 +64,21 @@ fun readNextBoolean(prompt: String = ""): Boolean {
         else -> false
     }
 }
+
+fun readNextOptionalInt(prompt: String = ""): Int? {
+    while (true) {
+        print(prompt)
+        val text = readln().trim()
+
+        if (text.isEmpty()) {
+            return null
+        }
+
+        val value = text.toIntOrNull()
+        if (value != null) {
+            return value
+        }
+
+        println("Please enter a valid integer, or leave it blank.")
+    }
+}
