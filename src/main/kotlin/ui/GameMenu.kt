@@ -5,6 +5,14 @@ import utils.readNextInt
 import utils.readNextLine
 import utils.readNextOptionalInt
 
+private data class GameDetails(
+    val title: String,
+    val version: Int?,
+    val rating: Int,
+    val releaseYear: Int,
+    val genre: String,
+)
+
 class GameMenu(private val gameService: GameService) {
 
     fun start() {
@@ -14,6 +22,7 @@ class GameMenu(private val gameService: GameService) {
             when (option) {
                 1 -> addGame()
                 2 -> listGames()
+                3 -> updateGame()
                 0 -> println("Exiting App")
                 else -> println("Invalid option")
             }
@@ -28,6 +37,7 @@ class GameMenu(private val gameService: GameService) {
             |------------------------------
             ||  1) Add a game             |
             ||  2) List games             |
+            ||  3) Update a game          |
             |------------------------------
             ||  0) Exit                   |
             |------------------------------
@@ -46,18 +56,52 @@ class GameMenu(private val gameService: GameService) {
         }
     }
 
+    private fun readGameDetails() =
+        GameDetails(
+            title = readNextLine("Title: ").trim(),
+            version = readNextOptionalInt("Version (leave blank if none): "),
+            rating = readNextInt("Rating (0-100): "),
+            releaseYear = readNextInt("Release year: "),
+            genre = readNextLine("Genre: ").trim(),
+        )
+
     private fun addGame() {
-        val title = readNextLine("Title: ").trim()
-        val version = readNextOptionalInt("Version (leave blank if none): ")
-        val rating = readNextInt("Rating (0-100): ")
-        val releaseYear = readNextInt("Release year: ")
-        val genre = readNextLine("Genre: ").trim()
+        val details = readGameDetails()
 
         try {
-            val game = gameService.addGame(title, version, rating, releaseYear, genre)
+            val game = gameService.addGame(
+                details.title, details.version, details.rating, details.releaseYear, details.genre
+            )
             println("Game added:\n$game")
         } catch (e: IllegalArgumentException) {
             println("Game not added: ${e.message}")
+        }
+    }
+
+    private fun updateGame() {
+        if (gameService.getGames().isEmpty()) {
+            println("No games stored")
+            return
+        }
+
+        listGames()
+        val id = readNextInt("ID of the game to update: ")
+        val existing = gameService.findGameById(id)
+        if (existing == null) {
+            println("No game with ID $id")
+            return
+        }
+
+        println("Updating:\n$existing")
+        val details = readGameDetails()
+
+        try {
+            val updated = gameService.updateGame(
+                id, details.title, details.version, details.rating, details.releaseYear, details.genre
+            )
+            println(if (updated) "Game updated" else "Game not found")
+        } catch (e: IllegalArgumentException) {
+            println("Game not updated: ${e.message}")
         }
     }
 }
