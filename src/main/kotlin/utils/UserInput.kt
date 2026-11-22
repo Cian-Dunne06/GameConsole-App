@@ -65,20 +65,18 @@ fun readNextBoolean(prompt: String = ""): Boolean {
     }
 }
 
+fun parseOptionalInt(text: String): Int? {
+    val trimmed = text.trim()
+    return if (trimmed.isEmpty()) null else trimmed.toInt()
+}
+
 fun readNextOptionalInt(prompt: String = ""): Int? {
     while (true) {
         print(prompt)
-        val text = readln().trim()
-
-        if (text.isEmpty()) {
-            return null
+        try {
+            return parseOptionalInt(readln())
+        } catch (e: NumberFormatException) {
+            println("Please enter a valid integer, or leave it blank.")
         }
-
-        val value = text.toIntOrNull()
-        if (value != null) {
-            return value
-        }
-
-        println("Please enter a valid integer, or leave it blank.")
     }
 }
