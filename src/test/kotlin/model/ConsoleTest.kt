@@ -83,4 +83,14 @@ class ConsoleTest {
         val lastLine = validConsole(isSupported = false).toString().lines().last()
         assertEquals("Cost: 499.99 | Supported: No", lastLine)
     }
+
+    @Test
+    fun `infinite cost is rejected`() {
+        assertFailsWith<IllegalArgumentException> { validConsole(cost = Double.POSITIVE_INFINITY) }
+    }
+
+    @Test
+    fun `NaN cost is rejected`() {
+        assertFailsWith<IllegalArgumentException> { validConsole(cost = Double.NaN) }
+    }
 }
