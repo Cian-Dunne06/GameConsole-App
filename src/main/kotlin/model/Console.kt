@@ -15,8 +15,7 @@ data class Console(
         require(name.isNotBlank()) { "name must not be blank" }
         require(company.isNotBlank()) { "company must not be blank" }
         require(releaseYear in 1972..Year.now().value + 1) { "releaseYear must be between 1972 and next year" }
-        require(cost >= 0.0) { "cost must not be negative" }
-    }
+        require(cost.isFinite() && cost >= 0.0) { "cost must be a finite number, zero or more" }    }
 
     override fun toString(): String =
         """
