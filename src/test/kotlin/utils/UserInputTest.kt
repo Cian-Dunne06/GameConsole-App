@@ -41,4 +41,35 @@ class UserInputTest {
     fun `a decimal is rejected`() {
         assertFailsWith<NumberFormatException> { parseOptionalInt("2.5") }
     }
+
+    @Test
+    fun `yes answers are parsed as true`() {
+        assertEquals(true, parseYesNo("y"))
+        assertEquals(true, parseYesNo("yes"))
+        assertEquals(true, parseYesNo("true"))
+    }
+
+    @Test
+    fun `no answers are parsed as false`() {
+        assertEquals(false, parseYesNo("n"))
+        assertEquals(false, parseYesNo("no"))
+        assertEquals(false, parseYesNo("false"))
+    }
+
+    @Test
+    fun `case and surrounding spaces are ignored`() {
+        assertEquals(true, parseYesNo("  YES "))
+        assertEquals(false, parseYesNo(" No"))
+    }
+
+    @Test
+    fun `an unrecognised answer is null`() {
+        assertNull(parseYesNo("yse"))
+        assertNull(parseYesNo("maybe"))
+    }
+
+    @Test
+    fun `an empty answer is null`() {
+        assertNull(parseYesNo(""))
+    }
 }

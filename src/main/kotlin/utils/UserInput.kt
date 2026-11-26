@@ -26,35 +26,11 @@ fun readNextDouble(prompt: String = ""): Double {
     }
 }
 
-fun readNextFloat(prompt: String = ""): Float {
-    while (true) {
-        print(prompt)
 
-        val value = readln().trim().toFloatOrNull()
-        if (value != null) {
-            return value
-        }
-
-        println("Please enter a valid float.")
-    }
-}
 
 fun readNextLine(prompt: String = ""): String {
     print(prompt)
     return readln()
-}
-
-fun readNextChar(prompt: String = ""): Char {
-    while (true) {
-        print(prompt)
-        val input = readln().trim()
-
-        if (input.length == 1) {
-            return input[0]
-        }
-
-        println("Please enter exactly one character.")
-    }
 }
 
 fun readNextBoolean(prompt: String = ""): Boolean {
@@ -78,5 +54,23 @@ fun readNextOptionalInt(prompt: String = ""): Int? {
         } catch (e: NumberFormatException) {
             println("Please enter a valid integer, or leave it blank.")
         }
+    }
+}
+
+fun parseYesNo(text: String): Boolean? =
+    when (text.trim().lowercase()) {
+        "y", "yes", "true" -> true
+        "n", "no", "false" -> false
+        else -> null
+    }
+
+fun readNextYesNo(prompt: String = ""): Boolean {
+    while (true) {
+        print(prompt)
+        val answer = parseYesNo(readln())
+        if (answer != null) {
+            return answer
+        }
+        println("Please answer y or n.")
     }
 }
